@@ -19,38 +19,39 @@ save(token,file="./token_file")
 # In future sessions it can be loaded by running load("./token_file")
 
 ValidateToken(token)
-# 
-# option_list <- list(
-#   make_option(c("-s", "--stime"), type="character", default="2017-03-01", 
-#               help="start time as [default= %default]", metavar="character"),
-#   make_option(c("-e", "--etime"), type="character", default="2017-03-31", 
-#               help="end time as [default= %default]", metavar="character"),
-#   make_option(c("-t", "--tit"), type="character", default="March", 
-#               help="month as [default= %default]", metavar="character")
-# )
-# 
-# opt_parser <- OptionParser(option_list=option_list)
-# opt <- parse_args(opt_parser)
+
+option_list <- list(
+  make_option(c("-s", "--stime"), type="character", default="2017-03-01",
+              help="start time as [default= %default]", metavar="character"),
+  make_option(c("-e", "--etime"), type="character", default="2017-03-31",
+              help="end time as [default= %default]", metavar="character"),
+  make_option(c("-t", "--tit"), type="character", default="Mar",
+              help="month as [default= %default]", metavar="character")
+)
+
+opt_parser <- OptionParser(option_list=option_list)
+opt <- parse_args(opt_parser)
 setwd('C:/Users/Lily/Documents/GA/R/report/2017/')
-# stime <- opt$stime
-# etime <- opt$etime
-# tit <- opt$tit
-stime <- "2017-03-01"
-etime <- "2017-03-31"
-tit <- "March"
+stime <- opt$stime
+etime <- opt$etime
+tit <- opt$tit
+# stime <- "2017-03-01"
+# etime <- "2017-03-31"
+# tit <- "Mar"
 
 library(XML)
 theurl <- "http://srcqnap.qnap.com.tw/en/product/_info.php"
 
 html <- htmlParse(theurl)
 sched <- readHTMLTable(html, stringsAsFactors = FALSE)
-product <- readHTMLTable(html, stringsAsFactors = FALSE, encoding="big5")[[2]]# 2nd table
-product <- as.data.frame(lapply(product, function(x) iconv(x, "UTF-8", "BIG-5")))
+product <- readHTMLTable(html, stringsAsFactors = FALSE)[[2]]# 2nd table
+#product <- as.data.frame(lapply(product, function(x) iconv(x, "UTF-8", "BIG-5")))
+colnames(product) <- c("Model_ID", "Model_name", "time", "main_type", "sub_type", "type", "series", "history", "support")
 write.csv(product, "table.csv") 
-IDs <- product$機種ID
-#IDs <- product[,"機種ID"]
+IDs <- product$Model_ID
+#IDs <- product[,"Model_ID"]
 
-keyclass <- unique(product$主類別)
+keyclass <- unique(product$main_type)
 
 #32國當月份流量前三機種
 myfunction_countsessions <- function(ID,data){
@@ -75,24 +76,24 @@ myfunction_top3 <- function(cname, stime, etime){
   result.data <- data.frame(urls = gaData$pagePath, sessions = gaData$sessions)
   SUMs <- sapply(IDs, myfunction_countsessions,result.data)
   print(str(SUMs))
-  table <- data.frame(機種ID = rownames(data.frame(SUMs)), sum = SUMs)
+  table <- data.frame(Model_ID = rownames(data.frame(SUMs)), sum = SUMs)
   rownames(table) <- 1:nrow(table)
-  #model主類別 <- product[match(table$機種ID, product$機種ID), ][4]
-  table[3] <- product[match(table$機種ID, product$機種ID), ][4]
-  HomeSOHO_table <- table[table$主類別=="Home & SOHO",]
-  SMB_table <- table[table$主類別=="SMB",]
-  Enterprise_table <- table[table$主類別=="Enterprise",]
-  #other_table <- table[table$主類別=="",]
+  #modelmain_type <- product[match(table$Model_ID, product$Model_ID), ][4]
+  table[3] <- product[match(table$Model_ID, product$Model_ID), ][4]
+  HomeSOHO_table <- table[table$main_type=="Home & SOHO",]
+  SMB_table <- table[table$main_type=="SMB",]
+  Enterprise_table <- table[table$main_type=="Enterprise",]
+  #other_table <- table[table$main_type=="",]
   
   HomeSOHO_top3 <- HomeSOHO_table[with(HomeSOHO_table,order(-sum)),][1:3,]
   SMB_top3 <- SMB_table[with(SMB_table,order(-sum)),][1:3,]
   Enterprise_top3 <- Enterprise_table[with(Enterprise_table,order(-sum)),][1:3,]
   #other_top3 <- other_table[with(other_table,order(-sum)),][1:3,]
   
-  HomeSOHO_top3_modelname <- product[match(HomeSOHO_top3$機種ID, product$機種ID),][,c(1:2,4)]
-  SMB_top3_modelname <- product[match(SMB_top3$機種ID, product$機種ID),][,c(1:2,4)]
-  Enterprise_top3_modelname <- product[match(Enterprise_top3$機種ID, product$機種ID),][,c(1:2,4)]
-  #other_top3_modelname <- product[match(other_top3$機種ID, product$機種ID),][,c(1:2,4)]
+  HomeSOHO_top3_modelname <- product[match(HomeSOHO_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
+  SMB_top3_modelname <- product[match(SMB_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
+  Enterprise_top3_modelname <- product[match(Enterprise_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
+  #other_top3_modelname <- product[match(other_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
   
   HomeSOHO_top3_result <- merge(HomeSOHO_top3,HomeSOHO_top3_modelname)
   SMB_top3_result <- merge(SMB_top3,SMB_top3_modelname)
@@ -116,7 +117,7 @@ for(i in 1:32){
 }
 
 colnames(result_TOP3) <- CLIST
-write.csv(result_TOP3, paste("Monthly/",tit,"/top3_dat/top3.csv")) 
+write.csv(result_TOP3, paste("Monthly/",tit,"/top3_dat/top3.csv", sep="")) 
 t_top3 <- t(result_TOP3)
 
 
@@ -124,7 +125,7 @@ makeplotfunction <- function(i,cname){
   #i  seq(from=1, to=512, by=16)
   countryname <- data.frame(t(cbind(t_top3[i:(i+3),],t_top3[(i+4):(i+7),],t_top3[(i+8):(i+11),])), country = cname)
   colnames(countryname) <- c("ID","type","sessions","model","country")
-  print(head(countryname))
+  #print(head(countryname))
   countryname$sessions = as.double(levels(countryname$sessions))[countryname$sessions] 
   p1 <- ggplot(countryname[1:3,], aes(model, sessions)) + 
     geom_bar(stat="identity", position="dodge", width=0.5, fill="#FF6600") +   
@@ -145,7 +146,7 @@ makeplotfunction <- function(i,cname){
   title=textGrob(as.character(cname), gp=gpar(fontsize=15))#fontface="bold")
   A1 <- grid.arrange(p1, p2, p3, ncol = 2, top = title)
   print("plot!")
-  ggsave(paste("Monthly/", tit, "top3/Top3__", cname, ".png", sep = ""), A1)
+  ggsave(paste("Monthly/", tit, "/top3/Top3__", cname, ".png", sep = ""), A1)
   return(A1) 
 }
 
@@ -155,7 +156,7 @@ RE <- mapply(makeplotfunction, i, clist)
 j <- seq(from=1, to=32, by=4)
 k <- c(1:8)
 gridfunction <- function(i,j){
-  title1 <- textGrob(paste("Top 3 products (", tit,". 2017)"), gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
+  title1 <- textGrob(paste("Top 3 products (", tit,". 2017)", sep=""), gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
   B1 <- grid.arrange(ncol = 2,grobs=c(RE[i:(i+3)]),top = title1)
   ggsave(paste("Monthly/", tit, "/top3/00", j, ".png", sep=""), B1, scale=2)
   return(B1)
