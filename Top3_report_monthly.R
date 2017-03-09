@@ -122,7 +122,6 @@ t_top3 <- t(result_TOP3)
 
 
 makeplotfunction <- function(i,cname){ 
-  #i  seq(from=1, to=512, by=16)
   countryname <- data.frame(t(cbind(t_top3[i:(i+3),],t_top3[(i+4):(i+7),],t_top3[(i+8):(i+11),])), country = cname)
   colnames(countryname) <- c("ID","type","sessions","model","country")
   #print(head(countryname))

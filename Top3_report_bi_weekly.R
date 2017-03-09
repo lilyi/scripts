@@ -4,7 +4,8 @@ require(devtools)
 require(RGoogleAnalytics)
 library(grid)
 library(gridExtra)
-
+library(optparse)
+library(ggplot2)
 # Authorize the Google Analytics account
 # This need not be executed in every session once the token object is created 
 # and saved
@@ -19,23 +20,35 @@ save(token,file="./token_file")
 
 ValidateToken(token)
 
+option_list <- list(
+  make_option(c("-s", "--stime"), type="character", default="2017-03-06",
+              help="start time as [default= %default]", metavar="character"),
+  make_option(c("-e", "--etime"), type="character", default="2017-03-17",
+              help="end time as [default= %default]", metavar="character"),
+  make_option(c("-t", "--tit"), type="character", default="0306-0317",
+              help="month as [default= %default]", metavar="character")
+)
+
+opt_parser <- OptionParser(option_list=option_list)
+opt <- parse_args(opt_parser)
 setwd('C:/Users/Lily/Documents/GA/R/report/2017/')
-stime <- "2017-02-20"
-etime <- "2017-03-03"
-tit <-"0220-0303"
+stime <- opt$stime
+etime <- opt$etime
+tit <- opt$tit
 
 library(XML)
 theurl <- "http://srcqnap.qnap.com.tw/en/product/_info.php"
 
 html <- htmlParse(theurl)
 sched <- readHTMLTable(html, stringsAsFactors = FALSE)
-product <- readHTMLTable(html, stringsAsFactors = FALSE, encoding="big5")[[2]]# 2nd table
-product <- as.data.frame(lapply(product, function(x) iconv(x, "UTF-8", "BIG-5")))
+product <- readHTMLTable(html, stringsAsFactors = FALSE)[[2]]# 2nd table
+#product <- as.data.frame(lapply(product, function(x) iconv(x, "UTF-8", "BIG-5")))
+colnames(product) <- c("Model_ID", "Model_name", "time", "main_type", "sub_type", "type", "series", "history", "support")
 write.csv(product, "table.csv") 
-IDs <- product$機種ID
-#IDs <- product[,"機種ID"]
+IDs <- product$Model_ID
+#IDs <- product[,"Model_ID"]
 
-keyclass <- unique(product$主類別)
+keyclass <- unique(product$main_type)
 
 #32國當月份流量前三機種
 myfunction_countsessions <- function(ID,data){
@@ -56,28 +69,28 @@ myfunction_top3 <- function(cname, stime, etime){
                      filters = "ga:pagePath=@/model\\.php\\?II=")
   ga.query <- QueryBuilder(query.list)
   gaData <- GetReportData(ga.query, token)
-  write.csv(gaData, paste("Monthly/",tit,"/top3_dat/", cname,".csv", sep="")) 
+  write.csv(gaData, paste("bi-weekly/",tit,"/top3_dat/", cname,".csv", sep="")) 
   result.data <- data.frame(urls = gaData$pagePath, sessions = gaData$sessions)
   SUMs <- sapply(IDs, myfunction_countsessions,result.data)
   print(str(SUMs))
-  table <- data.frame(機種ID = rownames(data.frame(SUMs)), sum = SUMs)
+  table <- data.frame(Model_ID = rownames(data.frame(SUMs)), sum = SUMs)
   rownames(table) <- 1:nrow(table)
-  #model主類別 <- product[match(table$機種ID, product$機種ID), ][4]
-  table[3] <- product[match(table$機種ID, product$機種ID), ][4]
-  HomeSOHO_table <- table[table$主類別=="Home & SOHO",]
-  SMB_table <- table[table$主類別=="SMB",]
-  Enterprise_table <- table[table$主類別=="Enterprise",]
-  #other_table <- table[table$主類別=="",]
+  #modelmain_type <- product[match(table$Model_ID, product$Model_ID), ][4]
+  table[3] <- product[match(table$Model_ID, product$Model_ID), ][4]
+  HomeSOHO_table <- table[table$main_type=="Home & SOHO",]
+  SMB_table <- table[table$main_type=="SMB",]
+  Enterprise_table <- table[table$main_type=="Enterprise",]
+  #other_table <- table[table$main_type=="",]
   
   HomeSOHO_top3 <- HomeSOHO_table[with(HomeSOHO_table,order(-sum)),][1:3,]
   SMB_top3 <- SMB_table[with(SMB_table,order(-sum)),][1:3,]
   Enterprise_top3 <- Enterprise_table[with(Enterprise_table,order(-sum)),][1:3,]
   #other_top3 <- other_table[with(other_table,order(-sum)),][1:3,]
   
-  HomeSOHO_top3_modelname <- product[match(HomeSOHO_top3$機種ID, product$機種ID),][,c(1:2,4)]
-  SMB_top3_modelname <- product[match(SMB_top3$機種ID, product$機種ID),][,c(1:2,4)]
-  Enterprise_top3_modelname <- product[match(Enterprise_top3$機種ID, product$機種ID),][,c(1:2,4)]
-  #other_top3_modelname <- product[match(other_top3$機種ID, product$機種ID),][,c(1:2,4)]
+  HomeSOHO_top3_modelname <- product[match(HomeSOHO_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
+  SMB_top3_modelname <- product[match(SMB_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
+  Enterprise_top3_modelname <- product[match(Enterprise_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
+  #other_top3_modelname <- product[match(other_top3$Model_ID, product$Model_ID),][,c(1:2,4)]
   
   HomeSOHO_top3_result <- merge(HomeSOHO_top3,HomeSOHO_top3_modelname)
   SMB_top3_result <- merge(SMB_top3,SMB_top3_modelname)
@@ -87,9 +100,7 @@ myfunction_top3 <- function(cname, stime, etime){
   return(result)
 }#return top3 ID & sum of sessions
 
-#cname <- list("Australia","Austria","Belgium","Canada")
 clist <- list("Australia","Austria","Belgium","Canada","Czechia","Denmark","France","Germany","Greece","Hong Kong","Hungary","India","Iran","Israel","Italy","Japan","Mexico","Netherlands","Norway","Poland","Portugal","Romania","South Africa","South Korea","Spain","Sweden","Switzerland","Taiwan","Thailand","Turkey","United Kingdom","United States")
-#n_clist <- list("Austria","Belgium","Czechia","Denmark","France","Germany","Greece","Hungary","Italy","Netherlands","Norway","Poland","Portugal","Romania","Spain","Sweden","Switzerland","Turkey","United Kingdom","Hong Kong","India","Iran","Israel","Japan","South Korea","Taiwan","Thailand","Canada","Mexico","United States","South Africa","Australia")
 
 TOP3_IDs <- sapply(clist, myfunction_top3, stime, etime)
 result_TOP3 <- data.frame(sapply(TOP3_IDs, as.character), stringsAsFactors=FALSE)
@@ -103,17 +114,16 @@ for(i in 1:32){
 }
 
 colnames(result_TOP3) <- CLIST
-write.csv(result_TOP3, paste("bi-weekly/", tit, "/top3_dat/top3.csv")) #!
+write.csv(result_TOP3, paste("bi-weekly/", tit, "/top3_dat/top3.csv", sep="")) #!
 t_top3 <- t(result_TOP3)
 
 #see top3_makeplots.R below
 
 library(ggplot2)
 makeplotfunction <- function(i,cname){ 
-  #i  seq(from=1, to=512, by=16)
   countryname <- data.frame(t(cbind(t_top3[i:(i+3),],t_top3[(i+4):(i+7),],t_top3[(i+8):(i+11),])), country = cname)
   colnames(countryname) <- c("ID","type","sessions","model","country")
-  print(head(countryname))
+  #print(head(countryname))
   countryname$sessions = as.double(levels(countryname$sessions))[countryname$sessions] 
   p1 <- ggplot(countryname[1:3,], aes(model, sessions)) + 
     geom_bar(stat="identity", position="dodge", width=0.5, fill="#FF6600") +   
