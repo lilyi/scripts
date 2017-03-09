@@ -3,6 +3,7 @@ require(devtools)
 #devtools::install_github("Tatvic/RGoogleAnalytics")
 require(RGoogleAnalytics)
 library(scales)
+library(ggplot2)
 library(optparse)
 # Authorize the Google Analytics account
 # This need not be executed in every session once the token object is created 

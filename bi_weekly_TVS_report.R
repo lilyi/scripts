@@ -2,6 +2,9 @@
 require(devtools)
 #devtools::install_github("Tatvic/RGoogleAnalytics")
 require(RGoogleAnalytics)
+library(reshape2)
+library(ggplot2)
+library(optparse)
 # Authorize the Google Analytics account
 # This need not be executed in every session once the token object is created 
 # and saved
@@ -13,10 +16,22 @@ save(token,file="./token_file")
 # In future sessions it can be loaded by running load("./token_file")
 ValidateToken(token)
 
+option_list <- list(
+  make_option(c("-s", "--stime"), type="character", default="2017-03-06", 
+              help="start time as [default= %default]", metavar="character"),
+  make_option(c("-e", "--etime"), type="character", default="2017-03-17", 
+              help="end time as [default= %default]", metavar="character"),
+  make_option(c("-t", "--tit"), type="character", default="0306-0317", 
+              help="month as [default= %default]", metavar="character")
+)
+
+opt_parser <- OptionParser(option_list=option_list)
+opt <- parse_args(opt_parser)
 setwd('C:/Users/Lily/Documents/GA/R/report/2017/')
-stime <- "2017-02-20"
-etime <- "2017-03-03"
-tit <-"0220-0303"
+stime <- opt$stime
+etime <- opt$etime
+tit <- opt$tit
+
 #function to get THUNDERBOLT NAS's SESSIONS of EACH LANGUAGE
 myfunction_fil <- function(lan, stime, etime, pID){
   query.list <- Init(table.id = "ga:3035421", start.date = stime,
@@ -50,7 +65,7 @@ colnames(res) <- lanlist
 res$NAS <- factor(c("TVS-1282T", "TVS-682T", "TVS-882T", "TVS-871T", "TVS-882ST2"), 
                   levels=c("TVS-1282T", "TVS-682T", "TVS-882T", "TVS-871T", "TVS-882ST2"))
 
-library(reshape2)
+
 mdat <- melt(res, id.vars="NAS", factorsAsStrings = TRUE)
 head(mdat)
 colnames(mdat) <- c("NAS","languages","sessions")
@@ -59,4 +74,3 @@ ggplot(mdat, aes(languages, sessions, fill=NAS)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.key.size = unit(0.3, "cm")) +
   labs(title = paste("Thunderbolt NAS (",tit, ")"))
 ggsave(paste("bi-weekly/",tit,"/TVS/THNAS.png",sep=""))
-########################
