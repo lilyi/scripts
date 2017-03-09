@@ -26,13 +26,18 @@ tit <-"0220-0303"
 
 library(XML)
 theurl <- "http://srcqnap.qnap.com.tw/en/product/_info.php"
+
 html <- htmlParse(theurl)
 sched <- readHTMLTable(html, stringsAsFactors = FALSE)
-product <- readHTMLTable(html, stringsAsFactors = FALSE)[[2]]# 2nd table
+product <- readHTMLTable(html, stringsAsFactors = FALSE, encoding="big5")[[2]]# 2nd table
+product <- as.data.frame(lapply(product, function(x) iconv(x, "UTF-8", "BIG-5")))
 write.csv(product, "table.csv") 
-IDs <- product$??????ID
-keyclass <- unique(product$?????????)
-#32??????????????????????????????
+IDs <- product$機種ID
+#IDs <- product[,"機種ID"]
+
+keyclass <- unique(product$主類別)
+
+#32國當月份流量前三機種
 myfunction_countsessions <- function(ID,data){
   S <- sum(data$sessions[grep(paste("II=\\b", ID, "\\b", sep=""), data$urls)])
   return(S)
@@ -51,28 +56,28 @@ myfunction_top3 <- function(cname, stime, etime){
                      filters = "ga:pagePath=@/model\\.php\\?II=")
   ga.query <- QueryBuilder(query.list)
   gaData <- GetReportData(ga.query, token)
-  write.csv(gaData, paste("bi-weekly/", tit, "/top3_dat/", cname,".csv", sep="")) 
+  write.csv(gaData, paste("Monthly/",tit,"/top3_dat/", cname,".csv", sep="")) 
   result.data <- data.frame(urls = gaData$pagePath, sessions = gaData$sessions)
   SUMs <- sapply(IDs, myfunction_countsessions,result.data)
   print(str(SUMs))
-  table <- data.frame(??????ID = rownames(data.frame(SUMs)), sum = SUMs)
+  table <- data.frame(機種ID = rownames(data.frame(SUMs)), sum = SUMs)
   rownames(table) <- 1:nrow(table)
-  #model????????? <- product[match(table$??????ID, product$??????ID), ][4]
-  table[3] <- product[match(table$??????ID, product$??????ID), ][4]
-  HomeSOHO_table <- table[table$?????????=="Home & SOHO",]
-  SMB_table <- table[table$?????????=="SMB",]
-  Enterprise_table <- table[table$?????????=="Enterprise",]
-  #other_table <- table[table$?????????=="",]
+  #model主類別 <- product[match(table$機種ID, product$機種ID), ][4]
+  table[3] <- product[match(table$機種ID, product$機種ID), ][4]
+  HomeSOHO_table <- table[table$主類別=="Home & SOHO",]
+  SMB_table <- table[table$主類別=="SMB",]
+  Enterprise_table <- table[table$主類別=="Enterprise",]
+  #other_table <- table[table$主類別=="",]
   
   HomeSOHO_top3 <- HomeSOHO_table[with(HomeSOHO_table,order(-sum)),][1:3,]
   SMB_top3 <- SMB_table[with(SMB_table,order(-sum)),][1:3,]
   Enterprise_top3 <- Enterprise_table[with(Enterprise_table,order(-sum)),][1:3,]
   #other_top3 <- other_table[with(other_table,order(-sum)),][1:3,]
   
-  HomeSOHO_top3_modelname <- product[match(HomeSOHO_top3$??????ID, product$??????ID),][,c(1:2,4)]
-  SMB_top3_modelname <- product[match(SMB_top3$??????ID, product$??????ID),][,c(1:2,4)]
-  Enterprise_top3_modelname <- product[match(Enterprise_top3$??????ID, product$??????ID),][,c(1:2,4)]
-  #other_top3_modelname <- product[match(other_top3$??????ID, product$??????ID),][,c(1:2,4)]
+  HomeSOHO_top3_modelname <- product[match(HomeSOHO_top3$機種ID, product$機種ID),][,c(1:2,4)]
+  SMB_top3_modelname <- product[match(SMB_top3$機種ID, product$機種ID),][,c(1:2,4)]
+  Enterprise_top3_modelname <- product[match(Enterprise_top3$機種ID, product$機種ID),][,c(1:2,4)]
+  #other_top3_modelname <- product[match(other_top3$機種ID, product$機種ID),][,c(1:2,4)]
   
   HomeSOHO_top3_result <- merge(HomeSOHO_top3,HomeSOHO_top3_modelname)
   SMB_top3_result <- merge(SMB_top3,SMB_top3_modelname)

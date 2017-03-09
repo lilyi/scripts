@@ -4,18 +4,22 @@ require(devtools)
 require(RGoogleAnalytics)
 library(scales)
 library(ggplot2)
+library(optparse)
+
 # Authorize the Google Analytics account
 # This need not be executed in every session once the token object is created 
 # and saved
 client.id <- "908916142832-bf3o6rpn8phh344booolr1ovfla7ea9p.apps.googleusercontent.com"
 client.secret <- "MlS4oatMCIMqzI3bpvWMeH3W"
-token <- Auth(client.id,client.secret)
+
+token <- Auth(client.id,client.secret)#
+
 # Save the token object for future sessions
 save(token,file="./token_file")
+
 # In future sessions it can be loaded by running load("./token_file")
 ValidateToken(token)
 
-library("optparse")
 option_list <- list(
   make_option(c("-s", "--stime"), type="character", default="2017-02-01", 
               help="start time as [default= %default]", metavar="character"),

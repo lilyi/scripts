@@ -4,7 +4,8 @@ require(devtools)
 require(RGoogleAnalytics)
 library(grid)
 library(gridExtra)
-
+library(optparse)
+library(ggplot2)
 # Authorize the Google Analytics account
 # This need not be executed in every session once the token object is created 
 # and saved
@@ -18,15 +19,39 @@ save(token,file="./token_file")
 # In future sessions it can be loaded by running load("./token_file")
 
 ValidateToken(token)
+# 
+# option_list <- list(
+#   make_option(c("-s", "--stime"), type="character", default="2017-03-01", 
+#               help="start time as [default= %default]", metavar="character"),
+#   make_option(c("-e", "--etime"), type="character", default="2017-03-31", 
+#               help="end time as [default= %default]", metavar="character"),
+#   make_option(c("-t", "--tit"), type="character", default="March", 
+#               help="month as [default= %default]", metavar="character")
+# )
+# 
+# opt_parser <- OptionParser(option_list=option_list)
+# opt <- parse_args(opt_parser)
+setwd('C:/Users/Lily/Documents/GA/R/report/2017/')
+# stime <- opt$stime
+# etime <- opt$etime
+# tit <- opt$tit
+stime <- "2017-03-01"
+etime <- "2017-03-31"
+tit <- "March"
 
 library(XML)
 theurl <- "http://srcqnap.qnap.com.tw/en/product/_info.php"
+
 html <- htmlParse(theurl)
 sched <- readHTMLTable(html, stringsAsFactors = FALSE)
-product <- readHTMLTable(html, stringsAsFactors = FALSE)[[2]]# 2nd table
+product <- readHTMLTable(html, stringsAsFactors = FALSE, encoding="big5")[[2]]# 2nd table
+product <- as.data.frame(lapply(product, function(x) iconv(x, "UTF-8", "BIG-5")))
 write.csv(product, "table.csv") 
 IDs <- product$機種ID
+#IDs <- product[,"機種ID"]
+
 keyclass <- unique(product$主類別)
+
 #32國當月份流量前三機種
 myfunction_countsessions <- function(ID,data){
   S <- sum(data$sessions[grep(paste("II=\\b", ID, "\\b", sep=""), data$urls)])
@@ -46,7 +71,7 @@ myfunction_top3 <- function(cname, stime, etime){
                      filters = "ga:pagePath=@/model\\.php\\?II=")
   ga.query <- QueryBuilder(query.list)
   gaData <- GetReportData(ga.query, token)
-  write.csv(gaData, paste("./report/Monthly/20170201-20170228/top3_data/", cname,".csv", sep="")) 
+  write.csv(gaData, paste("Monthly/",tit,"/top3_dat/", cname,".csv", sep="")) 
   result.data <- data.frame(urls = gaData$pagePath, sessions = gaData$sessions)
   SUMs <- sapply(IDs, myfunction_countsessions,result.data)
   print(str(SUMs))
@@ -77,12 +102,8 @@ myfunction_top3 <- function(cname, stime, etime){
   return(result)
 }#return top3 ID & sum of sessions
 
-stime <- "2017-02-01" #!
-etime <- "2017-02-28" #!
-#cname <- list("Australia","Austria","Belgium","Canada")
 clist <- list("Australia","Austria","Belgium","Canada","Czechia","Denmark","France","Germany","Greece","Hong Kong","Hungary","India","Iran","Israel","Italy","Japan","Mexico","Netherlands","Norway","Poland","Portugal","Romania","South Africa","South Korea","Spain","Sweden","Switzerland","Taiwan","Thailand","Turkey","United Kingdom","United States")
-#n_clist <- list("Austria","Belgium","Czechia","Denmark","France","Germany","Greece","Hungary","Italy","Netherlands","Norway","Poland","Portugal","Romania","Spain","Sweden","Switzerland","Turkey","United Kingdom","Hong Kong","India","Iran","Israel","Japan","South Korea","Taiwan","Thailand","Canada","Mexico","United States","South Africa","Australia")
-setwd('C:/Users/Lily/Documents/GA/R')
+
 TOP3_IDs <- sapply(clist, myfunction_top3, stime, etime)
 result_TOP3 <- data.frame(sapply(TOP3_IDs, as.character), stringsAsFactors=FALSE)
 coname <- c("ID","type","sessions","model")
@@ -95,12 +116,10 @@ for(i in 1:32){
 }
 
 colnames(result_TOP3) <- CLIST
-write.csv(result_TOP3, paste("./report/Monthly/20170201-20170228/top3_data/top3.csv")) #!
+write.csv(result_TOP3, paste("Monthly/",tit,"/top3_dat/top3.csv")) 
 t_top3 <- t(result_TOP3)
 
-#see top3_makeplots.R below
 
-library(ggplot2)
 makeplotfunction <- function(i,cname){ 
   #i  seq(from=1, to=512, by=16)
   countryname <- data.frame(t(cbind(t_top3[i:(i+3),],t_top3[(i+4):(i+7),],t_top3[(i+8):(i+11),])), country = cname)
@@ -126,27 +145,24 @@ makeplotfunction <- function(i,cname){
   title=textGrob(as.character(cname), gp=gpar(fontsize=15))#fontface="bold")
   A1 <- grid.arrange(p1, p2, p3, ncol = 2, top = title)
   print("plot!")
-  ggsave(paste("./report/Monthly/20170201-20170228/top3/Top3__", cname, ".png", sep = ""), A1)
-  return(A1) #!
+  ggsave(paste("Monthly/", tit, "top3/Top3__", cname, ".png", sep = ""), A1)
+  return(A1) 
 }
-#cname <- list("Australia","Austria","Belgium","Canada")
+
 i <- seq(from=1, to=384, by=12)
 RE <- mapply(makeplotfunction, i, clist)
-#title1=textGrob("Top 3 products (Feb. 2017)", gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
-#B1 <- grid.arrange(grobs=c(RE[1:4]),top = title1)
-#ggsave("C:\\Users\\Lily\\Documents\\GA\\R\\report\\Monthly\\20170201-20170228\\top3\\001.png", B1, scale=2)
 
 j <- seq(from=1, to=32, by=4)
 k <- c(1:8)
 gridfunction <- function(i,j){
-  title1=textGrob("Top 3 products (Feb. 2017)", gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
+  title1 <- textGrob(paste("Top 3 products (", tit,". 2017)"), gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
   B1 <- grid.arrange(ncol = 2,grobs=c(RE[i:(i+3)]),top = title1)
-  ggsave(paste("./report/Monthly/20170201-20170228/top3/00",j,".png",sep=""),B1,scale=2)
-  return(B1) #!
+  ggsave(paste("Monthly/", tit, "/top3/00", j, ".png", sep=""), B1, scale=2)
+  return(B1)
 }
 RE2 <- mapply(gridfunction, j, k)
 
-title1=textGrob("Top 3 products (Feb. 2017)", gp=gpar(fontsize=20, font=2), just = "top")
-B1 <- grid.arrange(ncol = 2,grobs=c(RE[9:12]),top = title1)
-j <- "03"
-ggsave(paste("./report/Monthly/20170201-20170228/top3/00",j,".png",sep=""),B1,scale=2)
+# title1=textGrob(paste("Top 3 products (", tit, " 2017)"), gp=gpar(fontsize=20, font=2), just = "top")
+# B1 <- grid.arrange(ncol = 2, grobs=c(RE[9:12]), top = title1)
+# j <- "03"
+# ggsave(paste("./report/Monthly/20170201-20170228/top3/00",j,".png",sep=""),B1,scale=2)
