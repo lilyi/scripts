@@ -28,6 +28,7 @@ client.secret <- "MlS4oatMCIMqzI3bpvWMeH3W"
 
 token <- Auth(client.id,client.secret)#
 invisible(GetProfiles(token))
+
 # Save the token object for future sessions
 #save(token,file="./token_file")
 

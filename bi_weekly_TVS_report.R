@@ -1,20 +1,39 @@
 #install.packages("RGoogleAnalytics")
 require(devtools)
 #devtools::install_github("Tatvic/RGoogleAnalytics")
+#devtools::install_github("Tatvic/RGoogleAnalytics")
+#devtools::install_github("Tatvic/RGoogleAnalytics")
+#devtools::install_github("Tatvic/RGoogleAnalytics")
+#install.packages("googleAuthR")
+# if(!require(googleAuthR)){
+#   if(!require(devtools)){
+#     install.packages("devtools")
+#   } else {
+#     devtools::install_github("MarkEdmondson1234/googleAuthR")
+#   }
+# }
+library(googleAuthR)
 require(RGoogleAnalytics)
 library(reshape2)
 library(ggplot2)
 library(optparse)
+options("googleAuthR.scopes.selected" = c("https://www.googleapis.com/auth/analytics"))
+options("googleAuthR.client_id" = "908916142832-bf3o6rpn8phh344booolr1ovfla7ea9p.apps.googleusercontent.com")
+options("googleAuthR.client_secret" = "MlS4oatMCIMqzI3bpvWMeH3W")
+# googleAuthR::gar_auth()
+service_token <- gar_auth_service("C:/Users/Lily/Documents/GA/R/key_secrets.json", scope=getOption("googleAuthR.scopes.selected"))
+
 # Authorize the Google Analytics account
 # This need not be executed in every session once the token object is created 
 # and saved
 client.id = "908916142832-bf3o6rpn8phh344booolr1ovfla7ea9p.apps.googleusercontent.com"
 client.secret = "MlS4oatMCIMqzI3bpvWMeH3W"
 token <- Auth(client.id,client.secret)
+invisible(GetProfiles(token))
 # Save the token object for future sessions
-save(token,file="./token_file")
+# save(token,file="./token_file")
 # In future sessions it can be loaded by running load("./token_file")
-ValidateToken(token)
+# ValidateToken(token)
 
 option_list <- list(
   make_option(c("-s", "--stime"), type="character", default="2017-03-06", 
