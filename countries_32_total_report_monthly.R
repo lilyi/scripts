@@ -14,9 +14,7 @@ require(RGoogleAnalytics)
 library(scales)
 library(ggplot2)
 library(optparse)
-options("googleAuthR.scopes.selected" = c("https://www.googleapis.com/auth/webmasters",
-                                          "https://www.googleapis.com/auth/analytics",
-                                          "https://www.googleapis.com/auth/tagmanager.readonly"))
+options("googleAuthR.scopes.selected" = c("https://www.googleapis.com/auth/analytics"))
 options("googleAuthR.client_id" = "908916142832-bf3o6rpn8phh344booolr1ovfla7ea9p.apps.googleusercontent.com")
 options("googleAuthR.client_secret" = "MlS4oatMCIMqzI3bpvWMeH3W")
 # googleAuthR::gar_auth()
