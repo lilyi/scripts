@@ -9,6 +9,7 @@ require(devtools)
 #     devtools::install_github("MarkEdmondson1234/googleAuthR")
 #   }
 # }
+library(grid)
 library(googleAuthR)
 require(RGoogleAnalytics)
 library(scales)
@@ -48,6 +49,9 @@ stime <- opt$stime
 etime <- opt$etime
 tit <- opt$tit
 
+# stime <- "2017-03-06"
+# etime <- "2017-03-17"
+
 #function to get SESSIONS of 32 COUNTRIES
 myfunction <- function(cname, stime, etime){
   query.list <- Init(table.id = "ga:3035421", start.date = stime,
@@ -84,7 +88,7 @@ arrangefunction <- function(i,k){
   ggsave(paste("bi-weekly/", tit, "/total/0", k, ".png", sep=""), A)
   return(A) 
 }
-
+mapply(arrangefunction, i, k)
 #######################try
 # gridfunction <- function(i,j){
 #   title1=textGrob(paste("Total sessions (", tit, ")", sep=""), gp=gpar(fontsize=20, font=2))#fontface="bold")

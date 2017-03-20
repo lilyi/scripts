@@ -9,6 +9,7 @@ require(devtools)
 #     devtools::install_github("MarkEdmondson1234/googleAuthR")
 #   }
 # }
+library(grid)
 library(googleAuthR)
 require(RGoogleAnalytics)
 library(scales)
@@ -99,3 +100,4 @@ arrangefunction <- function(i,k){
   ggsave(paste("Monthly/", tit, "/total/0", k, ".png", sep=""), A)
   return() 
 }
+mapply(arrangefunction, i, k)

@@ -59,7 +59,7 @@ myfunction_fil <- function(lan, stime, etime, pID){
                      max.results = 10000,
                      #sort="ga:date",
                      #segment = "sessions::condition::ga:pagePath=@/de-de/;ga:pagePath=@/model.php?II=233"
-                     filters = paste("ga:pagePath=@", lan,";ga:pagePath=@/model\\.php\\?II=", pID, sep = ""))
+                     filters = paste("ga:pagePath=@", lan,";ga:pagePath=~/model\\.php\\?II=", pID, sep = ""))
   ga.query <- QueryBuilder(query.list)
   gaData2 <- GetReportData(ga.query, token)
   if (is.null(gaData2)){

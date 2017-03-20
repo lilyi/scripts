@@ -53,6 +53,11 @@ stime <- opt$stime
 etime <- opt$etime
 tit <- opt$tit
 
+# stime <- "2017-03-06"
+# etime <- "2017-03-17"
+# tit <- "0306-0317"
+# cname <- "Australia"
+
 library(XML)
 theurl <- "http://srcqnap.qnap.com.tw/en/product/_info.php"
 
@@ -83,7 +88,7 @@ myfunction_top3 <- function(cname, stime, etime){
                      sort="ga:pagePath",
                      max.results = 10000,
                      segment = paste("sessions::condition::ga:country=@", cname, sep = ""),
-                     filters = "ga:pagePath=@/model\\.php\\?II=")
+                     filters = "ga:pagePath=~/model\\.php\\?II=")
   ga.query <- QueryBuilder(query.list)
   gaData <- GetReportData(ga.query, token)
   write.csv(gaData, paste("bi-weekly/",tit,"/top3_dat/", cname,".csv", sep="")) 
