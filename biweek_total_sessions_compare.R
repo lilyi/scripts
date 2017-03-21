@@ -23,4 +23,4 @@ A <- as.data.frame(lapply(clist, compare_biweek))
 colnames(A) <- clist
 B <- t(A)
 colnames(B) <- c("sum", "max", "min", "ave")
-write.csv(B, '0306-0317/total_dat/compare.csv')
+write.csv(B, '0306-0317/total_dat/compare_2.csv')
