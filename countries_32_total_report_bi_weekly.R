@@ -10,6 +10,7 @@ require(devtools)
 #   }
 # }
 library(grid)
+library(gridExtra)
 library(googleAuthR)
 require(RGoogleAnalytics)
 library(scales)
@@ -49,9 +50,9 @@ stime <- opt$stime
 etime <- opt$etime
 tit <- opt$tit
 
-# stime <- "2017-03-06"
-# etime <- "2017-03-17"
-
+stime <- "2017-03-06"
+etime <- "2017-03-17"
+tit <- "0306-0317"
 #function to get SESSIONS of 32 COUNTRIES
 myfunction <- function(cname, stime, etime){
   query.list <- Init(table.id = "ga:3035421", start.date = stime,
