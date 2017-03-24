@@ -25,7 +25,7 @@ A <- as.data.frame(lapply(clist, compare_biweek))
 colnames(A) <- clist
 B <- t(A)
 colnames(B) <- c("sum", "max", "min", "ave")
-write.csv(B, '0306-0317/total_dat/compare_2.csv')
+write.csv(B, '0306-0317/total_dat/compare_3.csv')
 cname <- "Germany"
 biweek_sesseions <- function(cname){
   thisdata <- read.csv(paste('0306-0317/total_dat/', cname, '.csv', sep=""), header = T)
@@ -49,8 +49,7 @@ biweek_sesseions <- function(cname){
 }
 lapply(clist, biweek_sesseions)
 ####
-
-
+A
 
 
 
