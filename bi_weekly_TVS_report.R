@@ -1,9 +1,6 @@
 #install.packages("RGoogleAnalytics")
 require(devtools)
 #devtools::install_github("Tatvic/RGoogleAnalytics")
-#devtools::install_github("Tatvic/RGoogleAnalytics")
-#devtools::install_github("Tatvic/RGoogleAnalytics")
-#devtools::install_github("Tatvic/RGoogleAnalytics")
 #install.packages("googleAuthR")
 # if(!require(googleAuthR)){
 #   if(!require(devtools)){
@@ -22,10 +19,6 @@ options("googleAuthR.client_id" = "908916142832-bf3o6rpn8phh344booolr1ovfla7ea9p
 options("googleAuthR.client_secret" = "MlS4oatMCIMqzI3bpvWMeH3W")
 # googleAuthR::gar_auth()
 service_token <- gar_auth_service("C:/Users/Lily/Documents/GA/R/key_secrets.json", scope=getOption("googleAuthR.scopes.selected"))
-
-# Authorize the Google Analytics account
-# This need not be executed in every session once the token object is created 
-# and saved
 client.id = "908916142832-bf3o6rpn8phh344booolr1ovfla7ea9p.apps.googleusercontent.com"
 client.secret = "MlS4oatMCIMqzI3bpvWMeH3W"
 token <- Auth(client.id,client.secret)
@@ -36,11 +29,11 @@ invisible(GetProfiles(token))
 # ValidateToken(token)
 
 option_list <- list(
-  make_option(c("-s", "--stime"), type="character", default="2017-03-06", 
+  make_option(c("-s", "--stime"), type="character", default="2017-03-20", 
               help="start time as [default= %default]", metavar="character"),
-  make_option(c("-e", "--etime"), type="character", default="2017-03-17", 
+  make_option(c("-e", "--etime"), type="character", default="2017-03-31", 
               help="end time as [default= %default]", metavar="character"),
-  make_option(c("-t", "--tit"), type="character", default="0306-0317", 
+  make_option(c("-t", "--tit"), type="character", default="0320-0331", 
               help="month as [default= %default]", metavar="character")
 )
 

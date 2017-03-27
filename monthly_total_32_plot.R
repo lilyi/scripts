@@ -1,7 +1,7 @@
 library(ggplot2)
 library(scales)
 setwd('C:/Users/Lily/Documents/GA/R/report/2017/')
-tit <- "Feb"
+tit <- "March"
 
 mydata <- read.csv(paste("Monthly/", tit, "/total_dat/Australia.csv", sep=""), header = T)
 head(mydata)
