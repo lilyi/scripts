@@ -34,7 +34,7 @@ invisible(GetProfiles(token))
 #ValidateToken(token)
 
 option_list <- list(
-  make_option(c("-s", "--stime"), type="character", default="2017-03-01", 
+  make_option(c("-s", "--stime"), type="character", default="2017-02-01", 
               help="start time as [default= %default]", metavar="character"),
   make_option(c("-e", "--etime"), type="character", default="2017-03-31", 
               help="end time as [default= %default]", metavar="character"),
@@ -55,7 +55,7 @@ setwd('C:/Users/Lily/Documents/GA/R/report/2017/')
 stime <- opt$stime
 etime <- opt$etime
 tit <- opt$tit
-# stime <- "2017-03-01"
+# stime <- "2017-02-01"
 # etime <- "2017-03-05"
 # cname <- "Taiwan"
 #function to get SESSIONS of 32 COUNTRIES
@@ -91,7 +91,7 @@ print("Here!")
 i <- seq(from=1, to=32, by=4)
 k <- c(1:8)
 arrangefunction <- function(i,k){
-  title1 <- textGrob(paste("Total sessions (", tit, ". 2017)", sep=""), gp = gpar(fontsize=14, font=2))#fontface="bold")
+  title1 <- textGrob(paste("Total sessions (", tit, " 2017)", sep=""), gp = gpar(fontsize=14, font=2))#fontface="bold")
   A <- do.call(arrangeGrob, c(res_sessions32[i:(i+3)], list(ncol=2),list(top=title1)))
   ggsave(paste("Monthly/", tit, "/total/0", k, ".png", sep=""), A)
   return() 

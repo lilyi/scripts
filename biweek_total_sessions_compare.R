@@ -5,12 +5,12 @@ setwd("C:/Users/Lily/Documents/GA/R/report/2017/bi-weekly/")
 # cname <- "Australia"
 clist <- list("Australia","Austria","Belgium","Canada","Czechia","Denmark","France","Germany","Greece","Hong Kong","Hungary","India","Iran","Israel","Italy","Japan","Mexico","Netherlands","Norway","Poland","Portugal","Romania","South Africa","South Korea","Spain","Sweden","Switzerland","Taiwan","Thailand","Turkey","United Kingdom","United States")
 compare_biweek <- function(cname){
-  thisdata <- read.csv(paste('0306-0317/total_dat/', cname, '.csv', sep=""), header = T)
+  thisdata <- read.csv(paste('0320-0331/total_dat/', cname, '.csv', sep=""), header = T)
   maxi_T <- max(thisdata$sessions)
   mini_T <- min(thisdata$sessions)
   ave_T <- round(mean(thisdata$sessions))
   sum_T <- sum(thisdata$sessions)
-  lastdata <- read.csv(paste('0220-0303/total_dat/', cname, '.csv', sep=""), header = T)
+  lastdata <- read.csv(paste('0306-0317/total_dat/', cname, '.csv', sep=""), header = T)
   maxi_L <- max(lastdata$sessions)
   mini_L <- min(lastdata$sessions)
   ave_L <- round(mean(lastdata$sessions))
@@ -25,12 +25,12 @@ A <- as.data.frame(lapply(clist, compare_biweek))
 colnames(A) <- clist
 B <- t(A)
 colnames(B) <- c("sum", "max", "min", "ave")
-write.csv(B, '0306-0317/total_dat/compare_3.csv')
+write.csv(B, '0320-0331/total_dat/compare_3.csv')
 cname <- "Germany"
 biweek_sesseions <- function(cname){
-  thisdata <- read.csv(paste('0306-0317/total_dat/', cname, '.csv', sep=""), header = T)
+  thisdata <- read.csv(paste('0320-0331/total_dat/', cname, '.csv', sep=""), header = T)
   ST <- thisdata$sessions
-  lastdata <- read.csv(paste('0220-0303/total_dat/', cname, '.csv', sep=""), header = T)
+  lastdata <- read.csv(paste('0306-0317/total_dat/', cname, '.csv', sep=""), header = T)
   SL <- lastdata$sessions
   data_set1 <- data.frame(date=as.character(thisdata$date),
                           this=ST,
@@ -42,7 +42,7 @@ biweek_sesseions <- function(cname){
   p <- ggplot(mdat, aes(date, sessions, colour = biweek))+#, linetype=country)) + 
     geom_line()+ 
     scale_x_date(labels = date_format("%m%d"))+
-    labs(title = paste(cname), x = "date (this, comparing with 0220-0303)", y = "sessions")
+    labs(title = paste(cname), x = "date (this, comparing with 0306-0317)", y = "sessions")
     #xlim(1,12)
   ggsave(paste("total_compare/", cname,".png",sep=""))
   return()

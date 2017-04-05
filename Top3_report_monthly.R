@@ -85,7 +85,7 @@ myfunction_top3 <- function(cname, stime, etime){
                      sort="ga:pagePath",
                      max.results = 10000,
                      segment = paste("sessions::condition::ga:country=@", cname, sep = ""),
-                     filters = "ga:pagePath=@/model\\.php\\?II=")
+                     filters = "ga:pagePath=~/model\\.php\\?II=")
   ga.query <- QueryBuilder(query.list)
   gaData <- GetReportData(ga.query, token)
   write.csv(gaData, paste("Monthly/",tit,"/top3_dat/", cname,".csv", sep="")) 
@@ -171,7 +171,7 @@ RE <- mapply(makeplotfunction, i, clist)
 j <- seq(from=1, to=32, by=4)
 k <- c(1:8)
 gridfunction <- function(i,j){
-  title1 <- textGrob(paste("Top 3 products (", tit,". 2017)", sep=""), gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
+  title1 <- textGrob(paste("Top 3 products (", tit," 2017)", sep=""), gp=gpar(fontsize=20, font=2), just = "top")#fontface="bold")
   B1 <- grid.arrange(ncol = 2,grobs=c(RE[i:(i+3)]),top = title1)
   ggsave(paste("Monthly/", tit, "/top3/00", j, ".png", sep=""), B1, scale=2)
   return(B1)

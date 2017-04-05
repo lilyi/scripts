@@ -43,7 +43,7 @@ colnames(top_mdat) <- c("date","country","sessions")
 A <- ggplot(top_mdat, aes(date, sessions, colour = country))+#, linetype=country)) + 
   geom_line()+ 
   scale_x_date(labels = date_format("%m%d"))+
-  labs(title = paste("Top 20 countries (", tit, ". 2017)", sep=""), x = "date", y = "sessions") +
+  labs(title = paste("Top 20 countries (", tit, " 2017)", sep=""), x = "date", y = "sessions") +
   theme(axis.text.x = element_text(angle = 0, hjust = 1), title = element_text(size = 10))
 ggsave(paste("Monthly/", tit, "/total/top20.png", sep=""), A)
 
