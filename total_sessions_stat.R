@@ -8,27 +8,35 @@ stat <- function(cname){
   upper <- round((mean + 2*std),2)
   lower <- round((mean - 2*std),2)
   bi_data <- read.csv(paste("C:/Users/Lily/Documents/GA/R/report/2017/bi-weekly/0320-0331/total_dat/", cname, ".csv", sep=""), header=T)
-  maxi <- max(bi_data$sessions)
-  mini <- min(bi_data$sessions)
-  if(maxi>upper){
+  maxi_bi <- max(bi_data$sessions)
+  mini_bi <- min(bi_data$sessions)
+  if(maxi_bi>upper){
     U_alert <- "+"
-    if(mini < lower){
+    L_alert <- ""
+    if(mini_bi < lower){
       L_alert <- "-"
     }
-  }else if(mini < lower){
+  }else if(mini_bi < lower){
     L_alert <- "-"
-    if(maxi > upper){
+    U_alert <- ""
+    if(maxi_bi > upper){
       U_alert <- "+"
     }
   }else{
     U_alert <- ""
     L_alert <- ""
   }
-  return(c(mean, std, upper,lower, maxi, mini, U_alert, L_alert))
+  U_dif <- abs(maxi_bi-upper)
+  L_dif <- abs(mini_bi-lower)
+  return(c(mean, std, upper,lower, maxi_bi, mini_bi, U_dif, L_dif, U_alert, L_alert))
 }
 stat(cname)
 A <- as.data.frame(lapply(clist, stat))
 colnames(A) <- clist
 B <- t(A)
-colnames(B) <- c("mean", "std", "upper", "lower", "max", "min", "U_alert", "L_alert")
-write.csv(B, 'stat.csv')
+colnames(B) <- c("mean", "std", "upper", "lower", "max_bi", "min_bi", "U_dif", "L_dif", "U_alert", "L_alert")
+C <- as.data.frame(B)
+lan_list<- c("en-au", "", "", "", "cs-cz", "", "fr-fr", "de-de", "", "zh-hk", "", "en-in", "", "", "it-it", "ja-jp", "es-mx", "nl-nl", "", "pl-pl", "pt-pt", "", "", "ko-kr", "es-es", "sv-se", "", "zh-tw", "th-th", "", "en-uk", "en-us")
+C$lan <- lan_list
+as.data.frame(C)
+write.csv(C, 'stat_lan.csv')
