@@ -57,4 +57,5 @@ i <- c(1:19)
 res <- as.data.frame(lapply(i, table_fun))
 row.names(res) <- c(1:3)
 View(res)
+write.csv(res, "solution_top3.csv") 
 
