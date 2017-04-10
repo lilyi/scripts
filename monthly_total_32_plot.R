@@ -37,10 +37,15 @@ top10df <- dataset_T[,topname]
 top10df$date <- mydata$date
 top_mdat <- melt(top10df, id="date")
 head(top_mdat)
+colnames(top_mdat) <- c("date","country","sessions") 
+top20_cname <- paste(unique(top_mdat$country), c(1:20))
+
+V <- data.frame(rank = c(1:20), name = top20_cname, c_name = unique(top_mdat$country))
+top_mdat[4] <- V[match(top_mdat$country, V$c_name),][2]
 library(scales)
-colnames(top_mdat) <- c("date","country","sessions")  
+ 
 #top_mdat$date <- as.Date(as.character(top_mdat$date), format="%Y%m%d")
-A <- ggplot(top_mdat, aes(date, sessions, colour = country))+#, linetype=country)) + 
+A <- ggplot(top_mdat, aes(date, sessions, colour = name))+#, linetype=country)) + 
   geom_line()+ 
   scale_x_date(labels = date_format("%m%d"))+
   labs(title = paste("Top 20 countries (", tit, " 2017)", sep=""), x = "date", y = "sessions") +
