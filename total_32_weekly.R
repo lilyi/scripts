@@ -59,7 +59,14 @@ myfunction <- function(cname, stime, etime, s2, e2){
   as.data.frame(gaData_2)
   SUM_2 <- sum(gaData_2$sessions)
   dif <- SUM_2-SUM_1
-  res <- cbind(SUM_1, SUM_2, dif)
+  if(dif > 0){
+    sign <- "+"
+  }else if(dif < 0){
+    sign <- "-"
+  }else{
+    sign <- "--"
+  }
+  res <- cbind(SUM_1, SUM_2, dif, sign)
   return(res)
 }
 
@@ -67,4 +74,8 @@ clist <- list("Australia","Austria","Belgium","Canada","Czechia","Denmark","Fran
 res_sessions32 <- sapply(clist, myfunction, stime, etime, s2, e2)
 res <- as.data.frame(t(res_sessions32))
 row.names(res) <- clist
-colnames(res) <- c("0326-0401", "0402-0408", "dif")
+colnames(res) <- c("0326-0401", "0402-0408", "dif", "sign")
+write.csv(res, 'weekly_sign.csv')
+
+
+
