@@ -7,7 +7,7 @@ stat <- function(cname){
   mean <- round(mean(Q1_data$sessions),2)
   upper <- round((mean + 2*std),2)
   lower <- round((mean - 2*std),2)
-  bi_data <- read.csv(paste("C:/Users/Lily/Documents/GA/R/report/2017/bi-weekly/0320-0331/total_dat/", cname, ".csv", sep=""), header=T)
+  bi_data <- read.csv(paste("C:/Users/Lily/Documents/GA/R/report/2017/bi-weekly/0403-0414/total_dat/", cname, ".csv", sep=""), header=T)
   maxi_bi <- max(bi_data$sessions)
   mini_bi <- min(bi_data$sessions)
   if(maxi_bi>upper){
@@ -39,4 +39,4 @@ C <- as.data.frame(B)
 lan_list<- c("en-au", "", "", "", "cs-cz", "", "fr-fr", "de-de", "", "zh-hk", "", "en-in", "", "", "it-it", "ja-jp", "es-mx", "nl-nl", "", "pl-pl", "pt-pt", "", "", "ko-kr", "es-es", "sv-se", "", "zh-tw", "th-th", "", "en-uk", "en-us")
 C$lan <- lan_list
 as.data.frame(C)
-write.csv(C, 'stat_lan.csv')
+write.csv(C, 'C:/Users/Lily/Documents/GA/R/report/2017/bi-weekly/0403-0414/stat_lan.csv')
