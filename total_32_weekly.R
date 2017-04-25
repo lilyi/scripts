@@ -32,10 +32,10 @@ setwd('C:/Users/Lily/Documents/GA/R/report/2017/weekly/')
 # etime <- opt$etime
 # tit <- opt$tit
 
-stime <- "2017-04-02"
-etime <- "2017-04-08"
-s2 <- "2017-04-09"
-e2 <- "2017-04-15"
+stime <- "2017-04-09"
+etime <- "2017-04-15"
+s2 <- "2017-04-16"
+e2 <- "2017-04-22"
 #function to get SESSIONS of 32 COUNTRIES
 myfunction <- function(cname, stime, etime, s2, e2){
   query.list_1 <- Init(table.id = "ga:3035421", start.date = stime,
@@ -74,8 +74,8 @@ clist <- list("Australia","Austria","Belgium","Canada","Czechia","Denmark","Fran
 res_sessions32 <- sapply(clist, myfunction, stime, etime, s2, e2)
 res <- as.data.frame(t(res_sessions32))
 row.names(res) <- clist
-colnames(res) <- c("0402-0408", "0409-0415", "dif", "sign")
-write.csv(res, 'weekly_sign_0415.csv')
+colnames(res) <- c("0409-0415", "0416-0422", "dif", "sign")
+write.csv(res, 'weekly_sign_0422.csv')
 
 
 
